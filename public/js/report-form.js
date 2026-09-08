@@ -45,32 +45,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // function to execute on report submission
     if (form) {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
+       form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-            // Collect all form fields
-            const reportData = {
-                type: typeInput.value,
-                title: document.getElementById('item-title').value.trim(),
-                category: document.getElementById('item-category').value,
-                date: document.getElementById('item-date').value,
-                description: document.getElementById('item-desc').value.trim(),
-                campus: document.getElementById('item-campus').value,
-                building: document.getElementById('item-building').value.trim(),
-                room: document.getElementById('item-room').value.trim(),
-                handoverMethod: document.querySelector('input[name="handoverMethod"]:checked')?.value || null
-            };
+        const campus = document.getElementById('item-campus').value;
+        const building = document.getElementById('item-building').value.trim();
+        const room = document.getElementById('item-room').value.trim();
 
-            console.log('Report submission data:', reportData);
+        const reportData = {
+            type: typeInput.value,
+            title: document.getElementById('item-title').value.trim(),
+            category: document.getElementById('item-category').value,
+            date: document.getElementById('item-date').value,
+            location: [campus, building, room].filter(Boolean).join(' - '),
+            description: document.getElementById('item-desc').value.trim()
+        };
 
-            // API CALL SHOULD BE HERE
+        console.log('Report submission data:', reportData);
+
+        try {
+            const response = await fetch('/api/items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reportData)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Failed to submit report.');
+            }
+
             alert('Report submitted successfully!');
             form.reset();
 
-            // Re-initialize default date after reset
             if (dateInput) {
                 dateInput.value = new Date().toISOString().split('T')[0];
             }
-        });
+
+            setReportMode('lost');
+
+        } catch (error) {
+            console.error('Report submission error:', error);
+            alert(`Failed to submit report: ${error.message}`);
+        }
+    });
     }
 });

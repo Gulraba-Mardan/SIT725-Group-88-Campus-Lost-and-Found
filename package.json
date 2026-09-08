@@ -74,18 +74,19 @@
     "wrappy": "^1.0.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "start": "node server.js",
+  "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mofareh221172728/SIT725-Group-88-Campus-Lost-and-Found.git"
+  "type": "git",
+  "url": "git+https://github.com/Gulraba-Mardan/SIT725-Group-88-Campus-Lost-and-Found.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/mofareh221172728/SIT725-Group-88-Campus-Lost-and-Found/issues"
+ "bugs": {
+  "url": "https://github.com/Gulraba-Mardan/SIT725-Group-88-Campus-Lost-and-Found/issues"
   },
-  "homepage": "https://github.com/mofareh221172728/SIT725-Group-88-Campus-Lost-and-Found#readme"
+  "homepage": "https://github.com/Gulraba-Mardan/SIT725-Group-88-Campus-Lost-and-Found#readme"
 }

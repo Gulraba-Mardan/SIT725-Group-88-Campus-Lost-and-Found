@@ -4,6 +4,50 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 
+const itemSchema = new mongoose.Schema(
+  {
+    type: {
+      type: String,
+      required: true,
+      enum: ["lost", "found"],
+    },
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    location: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    status: {
+      type: String,
+      enum: ["active", "resolved"],
+      default: "active",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Item = mongoose.model("Item", itemSchema);
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -19,41 +63,77 @@ app.use(express.json());
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, "public")));
 
-// Temporary in-memory storage
-const items = [];
+// Student identity endpoint required for SIT725 8.2HD
+app.get("/api/student", (req, res) => {
+  res.json({
+    name: "Gulireba-Maierdan",
+    studentId: "224414026",
+  });
+});
+
 
 // GET all items
-app.get("/api/items", (req, res) => {
-  res.json(items);
+app.get("/api/items", async (req, res) => {
+  try {
+    const items = await Item.find().sort({ createdAt: -1 });
+
+    const formattedItems = items.map((item) => ({
+      id: item._id.toString(),
+      type: item.type,
+      title: item.title,
+      category: item.category,
+      date: item.date,
+      location: item.location,
+      description: item.description,
+      status: item.status,
+    }));
+
+    res.json(formattedItems);
+  } catch (error) {
+    res.status(500).json({
+      message: "Unable to load reports.",
+    });
+  }
 });
 
 // POST a new item
-app.post("/api/items", (req, res) => {
-  const { type, title, category, date, location, description } = req.body;
+app.post("/api/items", async (req, res) => {
+  try {
+    const { type, title, category, date, location, description } = req.body;
 
-  // Required field validation
-  if (!type || !title || !category || !date || !location || !description) {
-    return res.status(400).json({
-      message: "All required fields must be provided.",
+    if (!type || !title || !category || !date || !location || !description) {
+      return res.status(400).json({
+        message: "All required fields must be provided.",
+      });
+    }
+
+    const newItem = await Item.create({
+      type,
+      title,
+      category,
+      date,
+      location,
+      description,
+    });
+
+    res.status(201).json({
+      message: "Report created successfully.",
+      item: {
+        id: newItem._id.toString(),
+        type: newItem.type,
+        title: newItem.title,
+        category: newItem.category,
+        date: newItem.date,
+        location: newItem.location,
+        description: newItem.description,
+        status: newItem.status,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Unable to create report.",
     });
   }
-
-  const newItem = {
-    id: items.length + 1,
-    type,
-    title,
-    category,
-    date,
-    location,
-    description,
-  };
-
-  items.push(newItem);
-
-  res.status(201).json({
-    message: "Report created successfully.",
-    item: newItem,
-  });
 });
 
 // Connect to MongoDB before starting the server
