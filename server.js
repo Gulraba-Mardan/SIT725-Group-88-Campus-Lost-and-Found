@@ -50,12 +50,7 @@ const Item = mongoose.model("Item", itemSchema);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  console.error("MONGODB_URI is not defined.");
-  process.exit(1);
-}
 
 // Parse JSON request bodies
 app.use(express.json());
@@ -136,17 +131,30 @@ app.post("/api/items", async (req, res) => {
   }
 });
 
-// Connect to MongoDB before starting the server
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => {
-    console.log("Connected to MongoDB");
+// Export (used by tests via Supertest)
 
-    app.listen(PORT, () => {
-      console.log(`Server running at http://localhost:${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error("MongoDB connection error:", error.message);
+module.exports = { app };
+
+// Start server
+if (require.main === module) {
+  const MONGODB_URI = process.env.MONGODB_URI;
+
+  if (!MONGODB_URI) {
+    console.error("MONGODB_URI is not defined.");
     process.exit(1);
-  });
+  }
+
+  mongoose
+    .connect(MONGODB_URI)
+    .then(() => {
+      console.log("Connected to MongoDB");
+
+      app.listen(PORT, () => {
+        console.log(`Server running at http://localhost:${PORT}`);
+      });
+    })
+    .catch((error) => {
+      console.error("MongoDB connection error:", error.message);
+      process.exit(1);
+    });
+}
