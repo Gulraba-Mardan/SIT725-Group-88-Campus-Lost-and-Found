@@ -142,7 +142,7 @@ Creates and stores a new lost or found report in MongoDB.
 
 ## Troubleshooting
 
-If port 3000 or port 27017 is already in use, stop any existing application or Docker container using that port before starting this project.
+If port 3000 is already in use, stop any existing application or Docker container using that port before starting this project.
 
 To stop containers created by this project, run:
 
