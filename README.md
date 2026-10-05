@@ -50,7 +50,14 @@ No local MongoDB installation is required because MongoDB runs inside a Docker c
 
 3. Build and start the application using:
 
-docker compose up --build -d
+docker compose up --build 
+
+Wait until the terminal displays:
+
+Connected to MongoDB
+Server running at http://localhost:3000
+
+Then open http://localhost:3000 in a web browser.
 
 4. Check that the containers are running:
 
@@ -132,3 +139,15 @@ Returns all lost and found reports stored in MongoDB.
 
 POST /api/items  
 Creates and stores a new lost or found report in MongoDB.
+
+## Troubleshooting
+
+If port 3000 or port 27017 is already in use, stop any existing application or Docker container using that port before starting this project.
+
+To stop containers created by this project, run:
+
+docker compose down
+
+Then start the application again:
+
+docker compose up --build
